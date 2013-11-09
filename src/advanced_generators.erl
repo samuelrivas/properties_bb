@@ -34,20 +34,27 @@ prop_lengthy() ->
 
 %% A gb_set
 gb_set(G) ->
-  false.
+  ?LET(L, proper_types:list(G), gb_sets:from_list(L)).
 
 %% A list of Gs without duplicates (use remove_dups)
 unique_elements(G) ->
-  false.
+  ?LET(L, proper_types:list(G), remove_dups(L)).
 
 %% A better implementation of a sentence, now avoiding duplicated, leading and
 %% trailing white spaces
+word() ->
+  proper_types:non_empty(proper_types:list(basic_generators:small_letter())).
+
 sentence() ->
-  false.
+  ?LET(
+     Words, proper_types:list(word()),
+     string:join(Words, " ")).
 
 %% A better lengthy list that can generate lists of arbitrarily many Gs:
 better_lengthy_list(Length, G) ->
-  false.
+  ?LET(
+     {Prefix, L}, {proper_types:vector(Length, G), proper_types:list(G)},
+     Prefix ++ L).
 
 prop_better_lengthy() ->
   ?FORALL(
@@ -56,7 +63,7 @@ prop_better_lengthy() ->
 
 %% A tuple of three different Gs
 trio(G) ->
-  false.
+  ?SUCHTHAT({X, Y, Z}, {G, G, G}, X /= Y andalso Y /= Z andalso X /= Z).
 
 %%%_* Internals ========================================================
 remove_dups(L) ->
