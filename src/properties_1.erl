@@ -32,23 +32,31 @@ prop_sum_3() ->
 int_list() -> proper_types:list(proper_types:integer()).
 
 prop_concat_commutative() ->
-  false.
+  ?FORALL(
+     {L1, L2}, {int_list(), int_list()},
+     proper:equals(L1 ++ L2, L2 ++ L1)).
 
 prop_concat_associative() ->
-  false.
+  ?FORALL(
+     {L1, L2, L3}, {int_list(), int_list(), int_list()},
+     proper:equals((L1 ++ L2) ++ L3, L1 ++ (L2 ++ L3))).
 
 prop_concat_identity() ->
-  false.
+  ?FORALL(L, int_list(), proper:equals(L, L ++ [])).
 
 %% For the operation op/2, verify the same properties (one doesn't hold)
 prop_op_commutative() ->
-  false.
+  ?FORALL(
+     {L1, L2}, {int_list(), int_list()},
+     proper:equals(op(L1, L2), op(L2, L1))).
 
-prop_op_associative() ->
-  false.
+prop_op_associative() -> % This property doesn't hold!
+  ?FORALL(
+     {L1, L2, L3}, {int_list(), int_list(), int_list()},
+     proper:equals(op(op(L1, L2), L3), op(L1, op(L2, L3)))).
 
 prop_op_identity() ->
-  false.
+  ?FORALL(L, int_list(), proper:equals(L, op(L, []))).
 
 %%%_* Private Functions ================================================
 op(A, B) when A < B -> A ++ B;
