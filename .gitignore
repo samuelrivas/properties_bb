@@ -9,3 +9,4 @@ ebin/*.app
 src/temp
 .eunit/
 rebar/*
+.edts
