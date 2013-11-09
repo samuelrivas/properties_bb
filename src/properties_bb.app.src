@@ -1,0 +1,10 @@
+%% -*- mode: erlang; erlang-indent-level: 2 -*-
+{application, properties_bb,
+ [ {description , "Just a playground to learn some property based testing"}
+ , {vsn         , git}
+ , {registered  , []}
+ , {applications, [ kernel
+                  , stdlib
+                  ]}
+ , {env         , []}
+ ]}.
