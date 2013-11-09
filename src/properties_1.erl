@@ -7,6 +7,7 @@
 %%%_* Includes =========================================================
 -define(PROPER_NO_IMPORTS, true). %% I hate imported functions!
 -include_lib("proper/include/proper.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 %%%_* Properties =======================================================
 
@@ -54,6 +55,10 @@ prop_op_associative() -> % This property doesn't hold!
   ?FORALL(
      {L1, L2, L3}, {int_list(), int_list(), int_list()},
      proper:equals(op(op(L1, L2), L3), op(L1, op(L2, L3)))).
+
+%% But this would've passed!
+op_associative_test() ->
+  ?assertEqual(op(op([1], [2]), [3]), op([1], op([2], [3]))).
 
 prop_op_identity() ->
   ?FORALL(L, int_list(), proper:equals(L, op(L, []))).
