@@ -23,8 +23,36 @@ prop_sum_3() ->
           ?FORALL(Y, proper_types:pos_integer(),
                   X + Y =:= Y + X)).
 
+%% Exercise: Write the basic properties to verify
+%% * ++ is commutative
+%% * ++ is associative
+%% * [] is the identity element.
+%%
+%% Hint, instead of =:= you may use proper:equals/2 for better reporting
+int_list() -> proper_types:list(proper_types:integer()).
+
+prop_concat_commutative() ->
+  false.
+
+prop_concat_associative() ->
+  false.
+
+prop_concat_identity() ->
+  false.
+
+%% For the operation op/2, verify the same properties (one doesn't hold)
+prop_op_commutative() ->
+  false.
+
+prop_op_associative() ->
+  false.
+
+prop_op_identity() ->
+  false.
 
 %%%_* Private Functions ================================================
+op(A, B) when A < B -> A ++ B;
+op(A, B)            -> B ++ A.
 
 %%%_* Emacs ============================================================
 %%% Local Variables:
