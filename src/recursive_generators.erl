@@ -37,11 +37,21 @@ expr_type({_, '*', _})          -> times;
 expr_type({_, '+', _})          -> sum;
 expr_type(N) when is_integer(N) -> constant.
 
+format_expr({A, '+', B}) ->
+  io_lib:format("(~s+~s)", [format_expr(A), format_expr(B)]);
+format_expr({A, '*', B}) ->
+  io_lib:format("(~s*~s)", [format_expr(A), format_expr(B)]);
+format_expr(A) when is_integer(A) -> integer_to_list(A).
+
 %%%_* Properties =======================================================
 
 %%% Weak property, we just want to make sure we hit all the expression branches
 prop_eval() ->
-  ?FORALL(E, expr(), proper:collect(expr_type(E), is_integer(eval(E)))).
+  ?FORALL(
+     E, expr(),
+     ?WHENFAIL(
+        io:format("~nError with expression: ~s~n", [format_expr(E)]),
+        proper:collect(expr_type(E), is_integer(eval(E))))).
 
 %%%_* Generator =======================================================
 expr() -> ?SIZED(Size, expr(Size)).
