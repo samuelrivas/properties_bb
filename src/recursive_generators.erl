@@ -40,7 +40,7 @@ expr_type(N) when is_integer(N) -> constant.
 
 %%% Weak property, we just want to make sure we hit all the expression branches
 prop_eval() ->
-  ?FORALL(E, expr(), is_integer(eval(E))).
+  ?FORALL(E, expr(), proper:collect(expr_type(E), is_integer(eval(E)))).
 
 %%%_* Generator =======================================================
 expr() -> proper_types:integer().
