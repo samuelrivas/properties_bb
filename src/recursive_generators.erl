@@ -43,15 +43,20 @@ prop_eval() ->
   ?FORALL(E, expr(), proper:collect(expr_type(E), is_integer(eval(E)))).
 
 %%%_* Generator =======================================================
-expr() ->
+expr() -> ?SIZED(Size, expr(Size)).
+
+expr(0) -> proper_types:integer();
+expr(Size) ->
   proper_types:oneof(
     [proper_types:integer(),
-     mult(),
-     sum()]).
+     mult(Size),
+     sum(Size)]).
 
-mult() -> ?LET({E1, E2}, {expr(), expr()}, {E1, '*', E2}).
+mult(Size) ->
+  ?LET({E1, E2}, {expr(Size div 2), expr(Size div 2)}, {E1, '*', E2}).
 
-sum() -> ?LET({E1, E2}, {expr(), expr()}, {E1, '+', E2}).
+sum(Size) ->
+  ?LET({E1, E2}, {expr(Size div 2), expr(Size div 2)}, {E1, '+', E2}).
 
 %%%_* Emacs ============================================================
 %%% Local Variables:
