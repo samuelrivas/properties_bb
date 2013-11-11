@@ -28,6 +28,7 @@ permutation(L)  ->
 
 -type expr() :: integer() | {expr(), 'x', expr()} | {expr(), '+', expr()}.
 
+eval({_, '+', {_, '*', {_, '+', _}}}) -> throw(ouch);
 eval({A, '+', B}) -> eval(A) + eval(B);
 eval({A, '*', B}) -> eval(A) * eval(B);
 eval(A) when is_integer(A) -> A.
