@@ -27,7 +27,7 @@ test: compile
 	$(REBAR) eunit skip_deps=true
 
 doc: $(REBAR)
-	$(REBAR) doc skip_deps
+	$(REBAR) doc
 
 clean:
 	$(REBAR) clean
