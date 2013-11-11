@@ -43,8 +43,15 @@ prop_eval() ->
   ?FORALL(E, expr(), proper:collect(expr_type(E), is_integer(eval(E)))).
 
 %%%_* Generator =======================================================
-expr() -> proper_types:integer().
+expr() ->
+  proper_types:oneof(
+    [proper_types:integer(),
+     mult(),
+     sum()]).
 
+mult() -> ?LET({E1, E2}, {expr(), expr()}, {E1, '*', E2}).
+
+sum() -> ?LET({E1, E2}, {expr(), expr()}, {E1, '+', E2}).
 
 %%%_* Emacs ============================================================
 %%% Local Variables:
