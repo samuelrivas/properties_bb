@@ -44,6 +44,12 @@ prop_tokens() ->
        T, template(),
        proper:equals(to_tokens(T), template:tokens(to_string(T)))).
 
+prop_parse() ->
+    ?FORALL(
+       T, template(),
+       proper:equals(
+         to_parsed(T),template:parse(template:tokens(to_string(T))))).
+
 %% Internals ============================================================
 
 %% Change sequences like [{text, "a"}, {text, "b"}] in [{text, "ab"}]
@@ -72,6 +78,12 @@ to_string_acc({var, V}) ->
     lists:flatten(io_lib:format("@~s@", [V]));
 to_string_acc({text, S}) ->
     S.
+
+to_parsed(Template) ->
+    [to_parsed_acc(X) || X <- Template].
+
+to_parsed_acc({var, Name}) -> {var, Name};
+to_parsed_acc({text, S}) -> {text, S}.
 
 format_failure(Template, Substs, Expected, Result) ->
     io:format(
