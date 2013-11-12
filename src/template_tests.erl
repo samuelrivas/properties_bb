@@ -8,11 +8,19 @@
 printable_char() ->
     proper_types:elements(lists:seq($ , $~)).
 
+%% Any printable char but @
+valid_char() ->
+    ?SUCHTHAT(C, printable_char(), C =/= $@).
+
 string() ->
     proper_types:list(printable_char()).
 
+%% Non-empty string without any @
 valid_string() ->
-    proper_types:non_empty(string()).
+    non_empty_list(valid_char()).
+
+non_empty_list(G) ->
+    proper_types:non_empty(proper_types:list(G)).
 
 text() ->
     {text, valid_string()}.
