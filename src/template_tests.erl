@@ -30,7 +30,9 @@ var() ->
 
 %% Generates the internal representation of a string with substitutions
 template() ->
-    proper_types:list(proper_types:elements([text(), var()])).
+    ?LET(
+       Raw, proper_types:list(proper_types:elements([text(), var()])),
+       fold_text(Raw)).
 
 %% Properties ==========================================================
 %% Test that no substitutions leave the string intact
@@ -43,6 +45,14 @@ prop_tokens() ->
        proper:equals(to_tokens(T), template:tokens(to_string(T)))).
 
 %% Internals ============================================================
+
+%% Change sequences like [{text, "a"}, {text, "b"}] in [{text, "ab"}]
+fold_text([{text, A}, {text, B} | T]) ->
+    fold_text([{text, A ++ B} | T]);
+fold_text([H | T]) ->
+    [H | fold_text(T)];
+fold_text([]) ->
+    [].
 
 %% Returns the expected token list from the internal representation of a
 %% template
