@@ -13,7 +13,9 @@ valid_char() ->
     ?SUCHTHAT(C, printable_char(), C =/= $@).
 
 string() ->
-    proper_types:list(printable_char()).
+    ?LET(
+       Chars, proper_types:vector(5, valid_char()),
+       proper_types:list(proper_types:elements(Chars))).
 
 %% Non-empty string without any @
 valid_string() ->
@@ -22,8 +24,17 @@ valid_string() ->
 non_empty_list(G) ->
     proper_types:non_empty(proper_types:list(G)).
 
+permutation([]) ->
+    [];
+permutation(L) ->
+    ?LET(E, proper_types:elements(L), [E | permutation(lists:delete(E, L))]).
+
 text() ->
     {text, valid_string()}.
+
+%% Generate a list of variables without duplicated keys
+var_list() ->
+    ?LET(L, proper_types:list(var()), remove_duplicated_keys(L)).
 
 var() ->
     {var, valid_string(), string()}.
@@ -31,8 +42,10 @@ var() ->
 %% Generates the internal representation of a string with substitutions
 template() ->
     ?LET(
-       Raw, proper_types:list(proper_types:elements([text(), var()])),
-       fold_text(Raw)).
+       {Texts, Vars}, {proper_types:list(text()), var_list()},
+          ?LET(
+             Template, permutation(Texts ++ Vars),
+             fold_text(Template))).
 
 %% Properties ==========================================================
 %% Test that no substitutions leave the string intact
@@ -126,3 +139,13 @@ format_failure(Template, Substs, Expected, Result) ->
       "Expected: ~p~n"
       "Got     : ~p~n",
       [Template, Substs, Expected, Result]).
+
+remove_duplicated_keys(Vars) ->
+    lists:foldl(
+      fun(Var = {var, Name, _}, Acc) ->
+              case lists:keymember(Name, 2, Acc) of
+                  true -> Acc;
+                  false -> [Var | Acc]
+              end
+      end,
+      [], Vars).
