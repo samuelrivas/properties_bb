@@ -8,7 +8,7 @@
 -type tok() :: at | {string, string()}.
 
 -spec string(string(), {string(), string()}) -> string().
-string(_String, _Subs) -> "".
+string(String, _Subs) -> String.
 
 -spec tokens(string()) -> [tok()].
 tokens(_String) -> [].
