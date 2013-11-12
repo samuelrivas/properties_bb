@@ -26,7 +26,7 @@ text() ->
     {text, valid_string()}.
 
 var() ->
-    {var, valid_string()}.
+    {var, valid_string(), string()}.
 
 %% Generates the internal representation of a string with substitutions
 template() ->
@@ -50,6 +50,18 @@ prop_parse() ->
        proper:equals(
          to_parsed(T),template:parse(template:tokens(to_string(T))))).
 
+prop_string() ->
+    ?FORALL(
+       T, template(),
+       begin
+           {Substs, String, Expected} =
+               {to_substs(T), to_string(T), to_result(T)},
+           Result = template:string(String, Substs),
+           ?WHENFAIL(
+              format_failure(String, Substs, Expected, Result),
+              proper:equals(Expected, Result))
+       end).
+
 %% Internals ============================================================
 
 %% Change sequences like [{text, "a"}, {text, "b"}] in [{text, "ab"}]
@@ -65,7 +77,7 @@ fold_text([]) ->
 to_tokens(Template) ->
     lists:concat([to_tokens_acc(X) || X <- Template]).
 
-to_tokens_acc({var, S}) ->
+to_tokens_acc({var, S, _}) ->
     [at, {string, S}, at];
 to_tokens_acc({text, S}) ->
     [{string, S}].
@@ -74,7 +86,7 @@ to_tokens_acc({text, S}) ->
 to_string(Template) ->
     lists:concat([to_string_acc(X) || X <- Template]).
 
-to_string_acc({var, V}) ->
+to_string_acc({var, V, _}) ->
     lists:flatten(io_lib:format("@~s@", [V]));
 to_string_acc({text, S}) ->
     S.
@@ -82,8 +94,25 @@ to_string_acc({text, S}) ->
 to_parsed(Template) ->
     [to_parsed_acc(X) || X <- Template].
 
-to_parsed_acc({var, Name}) -> {var, Name};
+to_parsed_acc({var, Name, _}) -> {var, Name};
 to_parsed_acc({text, S}) -> {text, S}.
+
+to_substs(T) ->
+    to_substs_acc(T).
+
+to_substs_acc([]) ->
+    [];
+to_substs_acc([{var, Name, Value} | T]) ->
+    [{Name, Value} | to_substs_acc(T)];
+to_substs_acc([{text, _} | T]) ->
+    to_substs_acc(T).
+
+%% Returns the expected result, after substituting variables by their values
+to_result(Template) ->
+    lists:concat([to_result_acc(X) || X <- Template]).
+
+to_result_acc({var, _, S}) -> S;
+to_result_acc({text, S}) -> S.
 
 format_failure(Template, Substs, Expected, Result) ->
     io:format(
