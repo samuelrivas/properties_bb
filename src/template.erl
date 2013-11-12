@@ -20,4 +20,17 @@ tokens(S) ->
     [{string, String} | tokens(T)].
 
 -spec parse([tok()]) -> [{text, string()} | {var, string()}].
-parse(_) -> [].
+parse(Tokens) ->
+    parse(Tokens, text).
+
+parse([at| T], Terminal) ->
+    parse(T, switch_terminal(Terminal));
+parse([{string, S}| T], Terminal) ->
+    [{Terminal, S}| parse(T, Terminal)];
+parse([], _) ->
+    [].
+
+switch_terminal(text) ->
+    var;
+switch_terminal(var) ->
+    text.
