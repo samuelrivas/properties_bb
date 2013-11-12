@@ -16,8 +16,10 @@
 %%  * [3, 2, 1]
 %%  * [2, 3, 1]
 %%  * ...
-permutation(L) ->
-  false.
+permutation([]) -> [];
+permutation(L)  ->
+  ?LET(E, proper_types:elements(L), [E | permutation(lists:delete(E, L))]).
+
 
 %%%_* Production Code ==================================================
 
