@@ -11,11 +11,14 @@ printable_char() ->
 string() ->
     proper_types:list(printable_char()).
 
+valid_string() ->
+    proper_types:non_empty(string()).
+
 text() ->
-    {text, string()}.
+    {text, valid_string()}.
 
 var() ->
-    {var, string()}.
+    {var, valid_string()}.
 
 %% Generates the internal representation of a string with substitutions
 template() ->
